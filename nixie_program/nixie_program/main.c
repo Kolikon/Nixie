@@ -2,74 +2,56 @@
 #define F_CPU 16000000UL
 #include "util/delay.h"
 
-const int PRZERWA = 500;
+const int PRZERWA = 200;
 
-
-void T1delay(int ile)
+void T1delay()
 {
-	TCNT1= 65536 - ile;
 	while( (TIFR1 & 1) == 0);
 	TIFR1= 1;
+	TCNT1= 49912;
+	
+	return;
 }
 
-
-int main(void)
+void wybor(unsigned char ust[3])
 {
-	// 1-out 0-in
-	DDRA= 0b00000000;   //in
-	DDRB= 0b11111111;   //out min
-	DDRC= 0b11111111;   //out sec
-	DDRD= 0b11111111;   //out hour
-
-	PORTA= 0b11111111;  //pull-up
-	
-	TCCR1B= 0b00000101; //prescaler= 1024
-	
-
-	unsigned char h, m, s;
-	unsigned char ust[3] = {23, 59, 59};
-
-	// ustawienie godziny
 	unsigned char wybrany= 0;
-
-	while (1)
-	{
-		while(1)
+	_delay_ms(PRZERWA);
+	while(1)
 		{
-			_delay_ms(PRZERWA);
-			PORTD= ust[0]%10 + (ust[0]/10)*16;
-			PORTB= ust[1]%10 + (ust[1]/10)*16;
-			PORTC= ust[2]%10 + (ust[2]/10)*16;
-
 			switch(wybrany)
 			{
 				case 0 :
-				PORTD= 0;
-				_delay_ms(PRZERWA);
-				break;
+				{
+					PORTC= 0xff;
+					PORTA= 0xff;
+					break;
+				}
 				case 1 :
-				PORTB= 0;
-				_delay_ms(PRZERWA);
-				break;
+				{
+					PORTB= 0xff;
+					break;
+				}
 				case 2 :
-				PORTC= 0;
-				_delay_ms(PRZERWA);
-				break;
+				{
+					PORTD= 0xff;
+					break;
+				}
 			}
-
-			if(PINA == 0b11111100)
+			_delay_ms(PRZERWA/2);
+			
+			if( (PINA & 3) == 0)
 			{
 				_delay_ms(PRZERWA);
-				break;
+				return;
 			}
 
-			if(PINA == 0b11111110)
+			if( (PINA & 3) == 1)
 			{
 				wybrany= (wybrany + 1)  % 3;
-				_delay_ms(PRZERWA);
 			}
 
-			if(PINA == 0b11111101)
+			if( (PINA & 3) == 2)
 			{
 				if(!wybrany)
 				{
@@ -78,36 +60,65 @@ int main(void)
 				{
 					ust[wybrany]= (ust[wybrany] + 1) % 60;
 				}
-				_delay_ms(PRZERWA);
-			}
-		}
-
-		// odtad leci
-		while(1)
-		{
-			if(PINA == 0b11111100)
-			{
-				_delay_ms(PRZERWA);
-				break;
 			}
 			
-			for(h= ust[0]; h < 24; h++)
-			{
-				PORTD= h%10 + (h/10)*16;
-				for(m= ust[1]; m < 60; m++)
-				{
-					PORTB= m%10 + (m/10)*16;
-					for(s= ust[2]; s < 60; s++)
-					{
-						PORTC= s%10 + (s/10)*16;
-						T1delay(15624);
-					}
-					ust[2]= 0;
-				}
-				ust[1]= 0;
-			}
-			ust[0]= 0;
-			s=m=h=0;
+			PORTD= ust[2]/10 + (ust[2]%10)*16;
+			PORTB= ust[1]/10 + (ust[1]%10)*16;
+			PORTC= ust[0]/10 + (ust[0]%10)*16;
+			PORTA= ( (PORTC & 0b00111100) << 2 ) + 0b1111;
+			_delay_ms(PRZERWA/2);
 		}
+	return;
+}
+
+
+int main(void)
+{
+	// 1-out 0-in
+	DDRA= 0b11110000;   //in
+	DDRC= 0b11111111;   //out hour
+	DDRB= 0b11111111;   //out min
+	DDRD= 0b11111111;   //out sec
+
+	PORTA= 0b11111111;  //pull-up
+	
+	TCCR1B= 0b00000101; //prescaler= 1024
+	
+	unsigned char ust[3] = {12, 34, 56};
+	
+	PORTD= ust[2]/10 + (ust[2]%10)*16;
+	PORTB= ust[1]/10 + (ust[1]%10)*16;
+	PORTC= ust[0]/10 + (ust[0]%10)*16;
+	PORTA= ( (PORTC & 0b00111100) << 2 ) + 0b1111;
+	
+	while(1)
+	{
+		if( (PINA & 3) == 0)
+		{
+			_delay_ms(PRZERWA);
+			wybor(ust);
+			PORTD= ust[2]/10 + (ust[2]%10)*16;
+			PORTB= ust[1]/10 + (ust[1]%10)*16;
+			PORTC= ust[0]/10 + (ust[0]%10)*16;
+			PORTA= ( (PORTC & 0b00111100) << 2 ) + 0b1111;
+		}
+		
+		ust[2]= (ust[2]+1)%60;
+		PORTD= ust[2]/10 + (ust[2]%10)*16;
+		
+		if(ust[2] == 0)
+		{
+			ust[1]= (ust[1]+1) % 60;
+			PORTB= ust[1]/10 + (ust[1]%10)*16;
+		}
+		
+		if(ust[1] == 0 && ust[2] == 0)
+		{
+			ust[0]= (ust[0]+1) % 24;
+			PORTC= ust[0]/10 + (ust[0]%10)*16;
+			PORTA= ( (PORTC & 0b00111100) << 2 ) + 0b1111;
+		}
+		
+		T1delay();
 	}
 }
