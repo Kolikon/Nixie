@@ -205,7 +205,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x398
+.text           0x00000000      0x478
  *(.vectors)
  .vectors       0x00000000       0x7c D:/Programy/AtmelStudio/7.0/Packs/atmel/ATmega_DFP/1.3.300/gcc/dev/atmega164a/avr5/crtatmega164a.o
                 0x00000000                __vector_default
@@ -295,22 +295,24 @@ END GROUP
                 0x000000a6                __vector_20
                 0x000000aa                . = ALIGN (0x2)
  *(.text.*)
- .text.T1delay  0x000000aa       0x18 main.o
+ .text.T1delay  0x000000aa       0x16 main.o
                 0x000000aa                T1delay
- .text.main     0x000000c2      0x282 main.o
-                0x000000c2                main
+ .text.wybor    0x000000c0      0x170 main.o
+                0x000000c0                wybor
+ .text.main     0x00000230      0x1f4 main.o
+                0x00000230                main
  .text.libgcc.div
-                0x00000344       0x28 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodhi4.o)
-                0x00000344                _div
-                0x00000344                __divmodhi4
+                0x00000424       0x28 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodhi4.o)
+                0x00000424                _div
+                0x00000424                __divmodhi4
  .text.libgcc.div
-                0x0000036c       0x28 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
-                0x0000036c                __udivmodhi4
-                0x00000394                . = ALIGN (0x2)
+                0x0000044c       0x28 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
+                0x0000044c                __udivmodhi4
+                0x00000474                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000394        0x0 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x00000394                _exit
-                0x00000394                exit
+ .fini9         0x00000474        0x0 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x00000474                _exit
+                0x00000474                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -329,11 +331,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000394        0x4 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x00000474        0x4 d:/programy/atmelstudio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000398                _etext = .
+                0x00000478                _etext = .
 
-.data           0x00800100        0x0 load address 0x00000398
+.data           0x00800100        0x0 load address 0x00000478
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -351,8 +353,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 [!provide]                PROVIDE (__bss_end, .)
-                0x00000398                __data_load_start = LOADADDR (.data)
-                0x00000398                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000478                __data_load_start = LOADADDR (.data)
+                0x00000478                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800100        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
